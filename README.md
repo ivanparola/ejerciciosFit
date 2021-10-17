@@ -1,19 +1,4 @@
-Explicar que instalar:
-1ro npm install
-el proyecyo se inicia con npm start
-
-Descripción del proyecyo: qué es lo que hace
-
-Documentacion de los endspoints, listado de los endpoints del proyecto
-
----------------------------------------------------------------------------------
-
 Ejercicios Fit
-
-Instrcciones de Uso
-
-Para utilizar el proyecto "Ejercicios Fit" lo primero que debe hacer es ejecutar el siguiente comando:
-npm install 
 
 Alcance de proyecto
 
@@ -42,3 +27,12 @@ Funcionalidades:
 - ABM ejercicios
 - ABM favoritos
 - ABM rutina
+
+
+Instrcciones de Uso
+
+Para utilizar el proyecto "Ejercicios Fit" lo primero que debe hacer es ejecutar el siguiente comando:
+npm install 
+
+
+Documentacion de los endspoints, listado de los endpoints del proyecto
