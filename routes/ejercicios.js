@@ -3,7 +3,7 @@ const router = express.Router();
 const data = require('../data/ejercicio');
 
 router.get('/', async (req, res) =>{
-    let ejercicios = await data.getEjercicios(req.query);
+    let ejercicios = await data.getEjercicios(req.query.tipo, req.query.dificultad);
 
     res.json(ejercicios);
 });
@@ -13,6 +13,21 @@ router.get('/:id', async (req, res) =>{
     let ejercicios = await data.getEjercicio(req.params.id);
 
     res.json(ejercicios);
+});
+
+router.post('/', async (req, res)=>{
+    const result = await data.addEjercicio(req.body);
+    res.send(result);
+  });
+
+router.put('/:id', async (req, res)=>{
+  const result = await data.updateEjercicio(req.params.id, req.body);
+  res.send(result);
+});
+
+router.delete('/:id', async (req, res)=>{
+  const result = await data.deleteEjercicio(req.params.id);
+  res.send(result);
 });
 
 //CRUD: 

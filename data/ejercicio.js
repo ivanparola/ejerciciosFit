@@ -1,12 +1,15 @@
 const connection = require('./connection');
 const ObjectId = require('mongodb').ObjectId; 
 
-async function getEjercicios(query){
+const DATABASE = 'ejercicios_fit';
+const COLLECTION_EJERCICIOS = 'ejercicios';
+
+async function getEjercicios(tipo, dificultad){
     const clientmongo = await connection.getConnection();
-    const query_st = {...query.tipo && {"tipo": query.tipo},
-                      ...query.dificultad && {"dificultad": query.dificultad} }
-    const ejercicios = await clientmongo.db('ejercicios_fit')
-                        .collection('ejercicios')
+    const query_st = {...tipo && {"tipo": tipo},
+                      ...dificultad && {"dificultad": dificultad} }
+    const ejercicios = await clientmongo.db(DATABASE)
+                        .collection(COLLECTION_EJERCICIOS)
                         .find(query_st)
                         .toArray();
     return ejercicios;                    
@@ -15,11 +18,37 @@ async function getEjercicios(query){
 async function getEjercicio(id){
     const clientmongo = await connection.getConnection();
     const o_id = new ObjectId(id);
-    const ejercicio = await clientmongo.db('ejercicios_fit')
-                        .collection('ejercicios')
+    const ejercicio = await clientmongo.db(DATABASE)
+                        .collection(COLLECTION_EJERCICIOS)
                         .findOne({_id:o_id});
     return ejercicio;                    
 }
 
 
-module.exports = {getEjercicios, getEjercicio};
+async function addEjercicio(ejercicio){
+    const connectiondb = await connection.getConnection();
+    const result = connectiondb.db(DATABASE)
+            .collection(COLLECTION_EJERCICIOS)
+            .insertOne(ejercicio);
+    return result;
+}
+
+async function updateEjercicio(id, ejercicio){
+    const connectiondb = await connection.getConnection();
+    const o_id = new ObjectId(id);
+    const result = connectiondb.db(DATABASE)
+            .collection(COLLECTION_EJERCICIOS)
+            .updateOne({_id:o_id}, {$set: ejercicio});
+    return result;
+}
+
+async function deleteEjercicio(id){
+    const connectiondb = await connection.getConnection();
+    const o_id = new ObjectId(id);
+    const result = connectiondb.db(DATABASE)
+            .collection(COLLECTION_EJERCICIOS)
+            .deleteOne({_id:o_id});
+    return result;
+}
+
+module.exports = {getEjercicios, getEjercicio, addEjercicio, updateEjercicio, deleteEjercicio};
