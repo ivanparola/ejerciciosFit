@@ -1,10 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const data = require('../data/ejercicio');
+const auth = require('../middleware/auth')
+
 
 router.get('/', async (req, res) =>{
     let ejercicios = await data.getEjercicios(req.query.tipo, req.query.dificultad);
 
+router.get('/', auth, async (req, res) =>{
+    let ejercicios = await data.getEjercicios();
     res.json(ejercicios);
 });
 
