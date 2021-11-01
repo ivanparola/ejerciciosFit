@@ -4,32 +4,27 @@ const data = require('../data/ejercicio');
 const auth = require('../middleware/auth')
 
 
-router.get('/', async (req, res) =>{
-    let ejercicios = await data.getEjercicios(req.query.tipo, req.query.dificultad);
-
 router.get('/', auth, async (req, res) =>{
-    let ejercicios = await data.getEjercicios();
+    let ejercicios = await data.getEjercicios(req.query.tipo, req.query.dificultad);
     res.json(ejercicios);
 });
 
-
-router.get('/:id', async (req, res) =>{
+router.get('/:id', auth, async (req, res) =>{
     let ejercicios = await data.getEjercicio(req.params.id);
-
     res.json(ejercicios);
 });
 
-router.post('/', async (req, res)=>{
+router.post('/', auth, async (req, res)=>{
     const result = await data.addEjercicio(req.body);
     res.send(result);
   });
 
-router.put('/:id', async (req, res)=>{
+router.put('/:id', auth, async (req, res)=>{
   const result = await data.updateEjercicio(req.params.id, req.body);
   res.send(result);
 });
 
-router.delete('/:id', async (req, res)=>{
+router.delete('/:id', auth, async (req, res)=>{
   const result = await data.deleteEjercicio(req.params.id);
   res.send(result);
 });
