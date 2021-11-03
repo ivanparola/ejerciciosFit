@@ -15,6 +15,28 @@ async function getEjercicios(tipo, dificultad){
     return ejercicios;                    
 }
 
+/* EJERCICIOS SOLO POR TIPO */
+async function getEjercicios(tipo){
+    const clientmongo = await connection.getConnection();
+    const query_st = {...tipo && {"tipo": tipo}}
+    const ejercicios = await clientmongo.db(DATABASE)
+                        .collection(COLLECTION_EJERCICIOS)
+                        .find(query_st)
+                        .toArray();
+    return ejercicios;                    
+}
+
+/* EJERCICIOS SOLO POR DIFICULTAD */
+async function getEjercicios(dificultad){
+    const clientmongo = await connection.getConnection();
+    const query_st = {...dificultad && {"dificultad": dificultad} }
+    const ejercicios = await clientmongo.db(DATABASE)
+                        .collection(COLLECTION_EJERCICIOS)
+                        .find(query_st)
+                        .toArray();
+    return ejercicios;                    
+}
+
 async function getEjercicio(id){
     const clientmongo = await connection.getConnection();
     const o_id = new ObjectId(id);

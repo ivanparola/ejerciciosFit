@@ -1,39 +1,60 @@
 const express = require('express');
-const router = express.Router();
+var router = express.Router();
 const data = require('../data/ejercicio');
 const auth = require('../middleware/auth')
 
-/* otra forma, esta ok? */
-/* router.get('api/ejercicios/', auth, async (req, res) =>{
+/* OTRA FORMA PROBANDO */
+   router.get('/',  async (req, res) =>{
   try {
-    if(req.query.dificultad && !req.query.tipo){
+    if(req.query.dificultad && !req.query.tipo)
+    {
       let dificultad = req.query.dificultad;
-      res.json(ejercicios.filter(ejercicio => ejercicio.dificultad == dificultad));
-    }else if (!req.query.dificultad && req.query.tipo){
+      let ejercicios = await data.getEjercicios(dificultad);
+      res.json(ejercicios);
+    }
+    else if (req.query.tipo && !req.query.dificultad)
+    {
       let tipo = req.query.tipo;
-      res.json(ejercicios.filter(ejercicio => ejercicio.tip == tipo));
-    }else if(req.query.dificultad && req.query.tipo){
+      let ejercicios = await data.getEjercicios();
+      res.json(ejercicios.filter(ejercicio => ejercicio.tipo == tipo));
+      /* res.json(ejercicios); */
+    }
+    else if(req.query.dificultad && req.query.tipo)
+    {
       let dificultad = req.query.dificultad;
       let tipo = req.query.tipo;
-      res.json(ejercicios.filter(ejercicio => ejercicio.tip == tipo && ejercicio.dificultad == dificultad));
-    }else{
+      let ejercicios = await data.getEjercicios(tipo, dificultad);
+      res.json(ejercicios); 
+      /* res.json(ejercicios.filter(ejercicio => ejercicio.tip == tipo && ejercicio.dificultad == dificultad)); */
+     }else{
       let ejercicios = await data.getEjercicios();
       res.json(ejercicios);
     }
   } catch (error) {
     console.log(error.message);
   }
-});
-
-router.get('api/ejercicios/:id', auth, async (req, res) =>{
+}); 
+/* 
+ router.get('/:id', auth, async (req, res) =>{
   const id = req.params.id;
   res.json(ejercicios.filter(data => data.id == parseInt(id))); 
   res.end();
-}); */
+});  */ 
 /* otra forma, esta ok? */
 
 router.get('/', auth, async (req, res) =>{
   let ejercicios = await data.getEjercicios(req.query.tipo, req.query.dificultad);
+  res.json(ejercicios);
+});
+
+router.get('/', async (req, res) =>{
+  let ejercicios = await data.getEjercicios(req.query.dificultad);
+  res.json(ejercicios);
+});
+
+/* Por tipo revisar  */
+router.get('/', async (req, res) =>{
+  let ejercicios = await data.getEjercicios(req.query.tipo);
   res.json(ejercicios);
 });
 
@@ -55,6 +76,6 @@ router.put('/:id', auth, async (req, res)=>{
 router.delete('/:id', auth, async (req, res)=>{
   const result = await data.deleteEjercicio(req.params.id);
   res.send(result);
-});
+}); 
 
 module.exports = router;
