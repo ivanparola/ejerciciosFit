@@ -3,58 +3,23 @@ var router = express.Router();
 const data = require('../data/ejercicio');
 const auth = require('../middleware/auth')
 
-/* OTRA FORMA PROBANDO */
-   router.get('/',  async (req, res) =>{
-  try {
-    if(req.query.dificultad && !req.query.tipo)
-    {
-      let dificultad = req.query.dificultad;
-      let ejercicios = await data.getEjercicios(dificultad);
-      res.json(ejercicios);
-    }
-    else if (req.query.tipo && !req.query.dificultad)
-    {
-      let tipo = req.query.tipo;
-      let ejercicios = await data.getEjercicios();
-      res.json(ejercicios.filter(ejercicio => ejercicio.tipo == tipo));
-      /* res.json(ejercicios); */
-    }
-    else if(req.query.dificultad && req.query.tipo)
-    {
-      let dificultad = req.query.dificultad;
-      let tipo = req.query.tipo;
-      let ejercicios = await data.getEjercicios(tipo, dificultad);
-      res.json(ejercicios); 
-      /* res.json(ejercicios.filter(ejercicio => ejercicio.tip == tipo && ejercicio.dificultad == dificultad)); */
-     }else{
-      let ejercicios = await data.getEjercicios();
-      res.json(ejercicios);
-    }
-  } catch (error) {
-    console.log(error.message);
-  }
-}); 
-/* 
- router.get('/:id', auth, async (req, res) =>{
-  const id = req.params.id;
-  res.json(ejercicios.filter(data => data.id == parseInt(id))); 
-  res.end();
-});  */ 
-/* otra forma, esta ok? */
-
 router.get('/', auth, async (req, res) =>{
   let ejercicios = await data.getEjercicios(req.query.tipo, req.query.dificultad);
   res.json(ejercicios);
 });
 
-router.get('/', async (req, res) =>{
-  let ejercicios = await data.getEjercicios(req.query.dificultad);
+router.get('/', auth, async (req, res) =>{
+  let ejercicios = await data.getAllEjercicios();
   res.json(ejercicios);
 });
 
-/* Por tipo revisar  */
-router.get('/', async (req, res) =>{
-  let ejercicios = await data.getEjercicios(req.query.tipo);
+router.get('/', auth, async (req, res) =>{
+  let ejercicios = await data.getEjerciciosPorDificultad(req.query.dificultad);
+  res.json(ejercicios);
+});
+
+router.get('/', auth, async (req, res) =>{
+  let ejercicios = await data.getEjercicioPorTipo(req.query.tipo);
   res.json(ejercicios);
 });
 
