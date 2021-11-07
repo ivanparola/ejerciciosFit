@@ -27,10 +27,20 @@ router.post('/', async (req, res)=>{
   res.send(result);
 });
 
+router.delete('/:id', async (req, res)=>{
+  try {
+    const result = await data.deleteUser(req.params.id);
+    result.deletedCount ? res.send(result) : res.status(404).json({'error': "id not found"});
+  } catch (error) { 
+    console.log(error.message);
+    res.status(500).json({'error': error.message});
+  }
+}); 
+
 router.put('/favoritos/:id', async(req, res)=>{
   let favoritos = await data.setFavorito(req.params.id, "6186e060147fab3176ceb300");
   res.json(favoritos);
   res.end();
-})
+});
 
 module.exports = router;

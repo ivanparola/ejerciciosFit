@@ -53,6 +53,15 @@ function generatedAuthToken(user) {
   return token;
 }
 
+async function deleteUser(id){
+    const connectiondb = await connection.getConnection();
+    const o_id = new ObjectId(id);
+    const result = connectiondb.db(DATABASE)
+            .collection(COLLECTION_USERS)
+            .deleteOne({_id:o_id});
+    return result;
+}
+
 async function setFavorito(exerciseid, userid) {
   const connectiondb = await connection.getConnection();
   /* validar el ejercicio exista (su id) */
@@ -89,4 +98,5 @@ module.exports = {
   generatedAuthToken,
   setFavorito,
   getUser,
+  deleteUser
 };
