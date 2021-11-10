@@ -19,6 +19,9 @@ async function getUser(id) {
 async function addUser(user) {
   const connectiondb = await connection.getConnection();
   user.favoritos = [];
+  user.plan = [];
+  user.activo = true;
+  /* user.rol = "usuario"; */
   user.password = await bcrypt.hash(user.password, 8);
   const result = connectiondb
     .db(DATABASE)
@@ -59,6 +62,8 @@ async function deleteUser(id){
     const result = connectiondb.db(DATABASE)
             .collection(COLLECTION_USERS)
             .deleteOne({_id:o_id});
+            /* .updateOne({_id:o_id},
+              { $set: { "activo": false } }); */
     return result;
 }
 

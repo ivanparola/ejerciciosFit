@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const data = require('../data/user');
+const jwt = require('jsonwebtoken');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -10,8 +11,12 @@ router.get('/', function(req, res, next) {
 router.post('/login', async(req, res)=>{
   try {
     const user = await data.findByCredentials(req.body.email, req.body.password);
-    const token = await data.generatedAuthToken(user);
-    res.send({user, token});
+/*     if(user.activo){ */
+      const token = await data.generatedAuthToken(user);
+      res.send({user, token});
+/*     }else{
+      res.send('Su cuenta esta inactiva')
+    }  */
   } catch (error) {
     res.status(401).send(error.message);
   }
@@ -31,6 +36,7 @@ router.delete('/:id', async (req, res)=>{
   try {
     const result = await data.deleteUser(req.params.id);
     result.deletedCount ? res.send(result) : res.status(404).json({'error': "id not found"});
+    /* res.send(result); */
   } catch (error) { 
     console.log(error.message);
     res.status(500).json({'error': error.message});
@@ -38,7 +44,13 @@ router.delete('/:id', async (req, res)=>{
 }); 
 
 router.put('/favoritos/:id', async(req, res)=>{
-  let favoritos = await data.setFavorito(req.params.id, "6186e060147fab3176ceb300");
+  /* OPTIMIZAR PROCEDIMIENTO DE DECODIFICAR DATOS DEL TOKEN */
+  const token = req.header('Token');
+  const tokendecode = jwt.verify(token, process.env.CLAVE_SECRETA);
+  console.log(tokendecode);
+  let unid = tokendecode._id; 
+  /* OPTIMIZAR PROCEDIMIENTO DE DECODIFICAR DATOS DEL TOKEN */
+  let favoritos = await data.setFavorito(req.params.id, unid);
   res.json(favoritos);
   res.end();
 });
