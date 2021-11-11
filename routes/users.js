@@ -1,13 +1,18 @@
 var express = require('express');
 var router = express.Router();
 const data = require('../data/user');
+const dataEj = require('../data/ejercicio');
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth')
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource'); 
+router.get('/', async function(req, res, next) {
+  res.json(await data.getAllUsers()); 
 });
+
+// router.get('/', function(req, res, next) {
+//   res.send('respond with a resource'); 
+// });
 
 router.post('/login', async(req, res)=>{
   try {
@@ -28,13 +33,21 @@ router.get('/:id', async(req,res,next)=>{
 });
 
 router.post('/', async (req, res)=>{
-  // TODO: Validar que sea correcto el objeto usuario
+  const o_User = req.body;
+  if(!o_User.email || !o_User.password){
+    res.status(400).json({'error': 'datos no válidos'});
+      return;
+  }
   const result = await data.addUser(req.body);
   res.send(result);
 });
 
 router.post('/admin', auth,  async (req, res)=>{
-  // TODO: Validar que sea correcto el objeto usuario
+  const o_User = req.body;
+  if(!o_User.email || !o_User.password){
+    res.status(400).json({'error': 'datos no válidos'});
+      return;
+  }
   const result = await data.addAdmin(req.body);
   res.send(result);
 });
@@ -54,10 +67,17 @@ router.delete('/:id', auth, async (req, res)=>{
 }); 
 
 router.put('/favoritos/:id', auth, async(req, res)=>{
-  let favoritos = await data.setFavorito(req.params.id, req.params.userid);
-  console.log(req.params.userid);
-  res.json(favoritos);
-  res.end();
+  //falta validar el formato del argumento para que no tire UnhandledPromiseRejectionWarning: TypeError: Argument passed in must be a Buffer or string of 12 bytes or a string of 24 hex characters
+  //esto pincha si no le mandan parámetros
+  id_param = req.params.id;
+    let fav = await dataEj.getEjercicio(id_param);
+    if(!fav){
+        res.status(404).json({'error': 'Ejercicio no encontrado'});
+        return;
+    }
+    let favoritos = await data.setFavorito(req.params.id, req.params.userid);
+    res.json(favoritos);
+    res.end();
 });
 
 module.exports = router;

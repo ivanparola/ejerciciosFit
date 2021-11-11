@@ -4,7 +4,20 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const DATABASE = "ejercicios_fit";
 const COLLECTION_USERS = "users";
+const COLLECTION_EJERCICIOS = 'ejercicios';
+
 const ObjectId = require("mongodb").ObjectId;
+
+
+async function getAllUsers() {
+  const clientmongo = await connection.getConnection();
+  const user = await clientmongo
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .find()
+    .toArray();
+  return user;
+}
 
 async function getUser(id) {
   const clientmongo = await connection.getConnection();
@@ -109,6 +122,7 @@ module.exports = {
   generatedAuthToken,
   setFavorito,
   getUser,
+  getAllUsers,
   deleteUser,
   addAdmin
 };
