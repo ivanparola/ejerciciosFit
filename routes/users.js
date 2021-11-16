@@ -71,6 +71,7 @@ router.delete('/:id', auth, async (req, res)=>{
 router.put('/favoritos/:id', auth, async(req, res)=>{
   //falta validar el formato del argumento para que no tire UnhandledPromiseRejectionWarning: TypeError: Argument passed in must be a Buffer or string of 12 bytes or a string of 24 hex characters
   //esto pincha si no le mandan parámetros
+  try{
   id_param = req.params.id;
     let fav = await dataEj.getEjercicio(id_param);
     if(!fav){
@@ -80,6 +81,10 @@ router.put('/favoritos/:id', auth, async(req, res)=>{
     let favoritos = await data.setFavorito(req.params.id, req.params.userid);
     res.json(favoritos);
     res.end();
+  }catch(error){
+    console.log(error.message);
+    res.status(404).json({'error': error.message});
+  }
 });
 
 module.exports = router;
