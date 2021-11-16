@@ -2,14 +2,32 @@ var express = require('express');
 var router = express.Router();
 const data = require('../data/user');
 const dataEj = require('../data/ejercicio');
+const ObjectId = require('mongodb').ObjectId; 
 const jwt = require('jsonwebtoken');
 const auth = require('../middleware/auth');
+const authadmin = require('../middleware/authadmin');
 const validator = require("email-validator");
+const adminvalidador = [auth, authadmin];
 
-/* GET users listing. */
-router.get('/', async function(req, res, next) {
-  res.send('Esto es EjerciciosFit'); 
- /*  res.json(await data.getAllUsers());  */
+/* Si lo pongo abajo no funciona */
+router.get('/favoritos', auth, async(req, res)=>{
+  try {
+    let favoritos = await data.getFavoritos(req.params.userid);
+    let lista = Promise.all(favoritos.map( async element => { return await dataEj.getEjercicio(element) }));
+    res.json(await lista);
+    res.end(); 
+  } catch (error) {
+    res.status(404).json({'error': error.message});
+  }
+});
+
+router.get('/', adminvalidador, async function(req, res, next) {
+   try{ 
+     /* res.send('Esto es EjerciciosFit');   */
+     res.json(await data.getAllUsers()); 
+  }catch (error) {
+    res.status(403).json({'error': error.message});
+  } 
 });
 
 router.post('/login', async(req, res)=>{
@@ -69,10 +87,8 @@ router.delete('/:id', auth, async (req, res)=>{
 }); 
 
 router.put('/favoritos/:id', auth, async(req, res)=>{
-  //falta validar el formato del argumento para que no tire UnhandledPromiseRejectionWarning: TypeError: Argument passed in must be a Buffer or string of 12 bytes or a string of 24 hex characters
-  //esto pincha si no le mandan parámetros
   try{
-  id_param = req.params.id;
+    id_param = req.params.id;
     let fav = await dataEj.getEjercicio(id_param);
     if(!fav){
         res.status(404).json({'error': 'Ejercicio no encontrado'});
@@ -86,5 +102,24 @@ router.put('/favoritos/:id', auth, async(req, res)=>{
     res.status(404).json({'error': error.message});
   }
 });
+
+
+
+/* router.put('/rutina', auth, async(req, res)=>{
+  try{
+    id_param = req.params.id;
+    let fav = await dataEj.getEjercicio(id_param);
+    if(!fav){
+        res.status(404).json({'error': 'Ejercicio no encontrado'});
+        return;
+    }
+    let favoritos = await data.setFavorito(req.params.id, req.params.userid);
+    res.json(favoritos);
+    res.end();
+  }catch(error){
+    console.log(error.message);
+    res.status(404).json({'error': error.message});
+  }
+}); */
 
 module.exports = router;
