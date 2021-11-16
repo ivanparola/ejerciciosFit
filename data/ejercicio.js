@@ -23,7 +23,7 @@ async function getEjercicios(tipo, dificultad){
     return ejercicios;                    
 }
 
-async function getEjercicioPorTipo(tipo){
+/* async function getEjercicioPorTipo(tipo){
     const clientmongo = await connection.getConnection();
     const query_st = {...tipo && {"tipo": tipo}}
     const ejercicios = await clientmongo.db(DATABASE)
@@ -41,7 +41,7 @@ async function getEjerciciosPorDificultad(dificultad){
                         .find(query_st)
                         .toArray();
     return ejercicios;                    
-}
+} */
 
 async function getEjercicio(id){
     const clientmongo = await connection.getConnection();
@@ -78,4 +78,4 @@ async function deleteEjercicio(id){
     return result;
 }
 
-module.exports = {getAllEjercicios, getEjercicios, getEjercicioPorTipo, getEjerciciosPorDificultad, getEjercicio, addEjercicio, updateEjercicio, deleteEjercicio};
+module.exports = {getAllEjercicios, getEjercicios, getEjercicio, addEjercicio, updateEjercicio, deleteEjercicio};
