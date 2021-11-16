@@ -36,3 +36,8 @@ npm install
 
 
 Documentacion de los endspoints, listado de los endpoints del proyecto
+
+PUT setfavorito
+Pasar siempre un argumento con formato de id para que no tire error
+
+
