@@ -31,7 +31,7 @@ async function getUser(id) {
 async function addUser(user) {
   const connectiondb = await connection.getConnection();
   user.favoritos = [];
-  user.plan = []; 
+  user.rutina = []; 
   user.activo = true;
   if(!user.rol){
     user.rol = "usuario";
@@ -113,6 +113,47 @@ async function setFavorito(exerciseid, userid) {
   return result;
 }
 
+async function getFavoritos(userid) {
+  const connectiondb = await connection.getConnection();
+  const user = await connectiondb
+                      .db(DATABASE)
+                      .collection(COLLECTION_USERS)
+                      .findOne({ _id: new ObjectId(userid)});
+
+  return user.favoritos;  
+} 
+
+/* async function setPlan(exerciseid, numrutina, userid) {
+  const connectiondb = await connection.getConnection();
+  const user = await connectiondb
+                      .db(DATABASE)
+                      .collection(COLLECTION_USERS)
+                      .findOne({ _id: new ObjectId(userid) });
+
+  if(user.rutina.find((diarutina) => diarutina == numrutina ))
+
+  let result;
+ 
+    if (user.rutina.ejerciciosdia.find((exercise) => exercise == exerciseid)) {
+      result = connectiondb
+                .db(DATABASE)
+                .collection(COLLECTION_USERS)
+                .updateOne(
+                  { _id: new ObjectId(userid) },
+                  { $pull: { "ejerciciosdia": exerciseid } }
+        );
+    } else {
+      result = connectiondb
+                .db(DATABASE)
+                .collection(COLLECTION_USERS)
+                .updateOne(
+                  { _id: new ObjectId(userid) },
+                  { $addToSet: { "favoritos": exerciseid } }
+                );
+    }
+  return result;
+} */
+
 module.exports = {
   addUser,
   findByCredentials,
@@ -121,5 +162,6 @@ module.exports = {
   getUser,
   getAllUsers,
   deleteUser,
-  addAdmin
+  addAdmin,
+  getFavoritos
 };
