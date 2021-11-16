@@ -1,6 +1,7 @@
 const express = require('express');
 var router = express.Router();
 const data = require('../data/ejercicio');
+const dataUser = require('../data/user');
 const auth = require('../middleware/auth');
 const authadmin = require('../middleware/authadmin');
 const adminvalidador = [auth, authadmin];
@@ -18,6 +19,22 @@ router.get('/', auth, async (req, res) =>{
 router.get('/', auth, async (req, res) =>{
   let ejercicios = await data.getAllEjercicios();
   res.json(ejercicios);
+});
+
+/* Si lo pongo abajo no funciona */
+router.get("/favoritos", auth, async (req, res) => {
+  try {
+    let favoritos = await dataUser.getFavoritos(req.params.userid);
+    let lista = Promise.all(
+      favoritos.map(async (element) => {
+        return await data.getEjercicio(element);
+      })
+    );
+    res.json(await lista);
+    res.end();
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
 });
 
 router.get('/:id', auth, async (req, res) =>{

@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const DATABASE = "ejercicios_fit";
 const COLLECTION_USERS = "users";
-const COLLECTION_EJERCICIOS = 'ejercicios';
+const COLLECTION_EJERCICIOS = "ejercicios";
 
 const ObjectId = require("mongodb").ObjectId;
 
@@ -31,9 +31,9 @@ async function getUser(id) {
 async function addUser(user) {
   const connectiondb = await connection.getConnection();
   user.favoritos = [];
-  user.rutina = []; 
+  user.rutina = [];
   user.activo = true;
-  if(!user.rol){
+  if (!user.rol) {
     user.rol = "usuario";
   }
   user.password = await bcrypt.hash(user.password, 8);
@@ -52,9 +52,9 @@ async function addAdmin(user) {
 async function findByCredentials(email, password) {
   const connectiondb = await connection.getConnection();
   const user = await connectiondb
-                      .db(DATABASE)
-                      .collection(COLLECTION_USERS)
-                      .findOne({ email: email });
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .findOne({ email: email });
   if (!user) {
     throw new Error("Credenciales no validas");
   }
@@ -67,61 +67,61 @@ async function findByCredentials(email, password) {
 
 function generatedAuthToken(user) {
   const token = jwt.sign(
-    { _id: user._id, email: user.email, rol: user.rol},
+    { _id: user._id, email: user.email, rol: user.rol },
     process.env.CLAVE_SECRETA,
     { expiresIn: "1h" }
   );
   return token;
 }
 
-async function deleteUser(id){
-    const connectiondb = await connection.getConnection();
-    const o_id = new ObjectId(id);
-    const result = connectiondb.db(DATABASE)
-            .collection(COLLECTION_USERS)
-            .updateOne({_id:o_id},
-              { $set: { "activo": false } });
-    return result;
+async function deleteUser(id) {
+  const connectiondb = await connection.getConnection();
+  const o_id = new ObjectId(id);
+  const result = connectiondb
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .updateOne({ _id: o_id }, { $set: { activo: false } });
+  return result;
 }
 
 async function setFavorito(exerciseid, userid) {
   const connectiondb = await connection.getConnection();
   const user = await connectiondb
-                      .db(DATABASE)
-                      .collection(COLLECTION_USERS)
-                      .findOne({ _id: new ObjectId(userid) });
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .findOne({ _id: new ObjectId(userid) });
 
   let result;
- 
-    if (user.favoritos.find((exercise) => exercise == exerciseid)) {
-      result = connectiondb
-                .db(DATABASE)
-                .collection(COLLECTION_USERS)
-                .updateOne(
-                  { _id: new ObjectId(userid) },
-                  { $pull: { "favoritos": exerciseid } }
-        );
-    } else {
-      result = connectiondb
-                .db(DATABASE)
-                .collection(COLLECTION_USERS)
-                .updateOne(
-                  { _id: new ObjectId(userid) },
-                  { $addToSet: { "favoritos": exerciseid } }
-                );
-    }
+
+  if (user.favoritos.find((exercise) => exercise == exerciseid)) {
+    result = connectiondb
+      .db(DATABASE)
+      .collection(COLLECTION_USERS)
+      .updateOne(
+        { _id: new ObjectId(userid) },
+        { $pull: { favoritos: exerciseid } }
+      );
+  } else {
+    result = connectiondb
+      .db(DATABASE)
+      .collection(COLLECTION_USERS)
+      .updateOne(
+        { _id: new ObjectId(userid) },
+        { $addToSet: { favoritos: exerciseid } }
+      );
+  }
   return result;
 }
 
 async function getFavoritos(userid) {
   const connectiondb = await connection.getConnection();
   const user = await connectiondb
-                      .db(DATABASE)
-                      .collection(COLLECTION_USERS)
-                      .findOne({ _id: new ObjectId(userid)});
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .findOne({ _id: new ObjectId(userid) });
 
-  return user.favoritos;  
-} 
+  return user.favoritos;
+}
 
 /* async function setPlan(exerciseid, numrutina, userid) {
   const connectiondb = await connection.getConnection();
@@ -163,5 +163,5 @@ module.exports = {
   getAllUsers,
   deleteUser,
   addAdmin,
-  getFavoritos
+  getFavoritos,
 };
