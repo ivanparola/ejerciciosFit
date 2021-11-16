@@ -19,7 +19,25 @@ router.get("/", adminvalidador, async function (req, res, next) {
   }
 });
 
-router.post("/login", async (req, res) => {
+router.put('/:id', auth, async (req, res)=>{
+  try {
+    const result = await data.updateUser(req.params.id, req.body);
+    result.matchedCount ? res.send(result) : res.status(404).json({'error': "id not found"});
+} catch (error) { 
+  res.status(500).json({'error': error.message});
+}
+});
+
+router.get('/', adminvalidador, async function(req, res, next) {
+   try{ 
+     /* res.send('Esto es EjerciciosFit');   */
+     res.json(await data.getAllUsers()); 
+  }catch (error) {
+    res.status(403).json({'error': error.message});
+  } 
+});
+
+router.post('/login', async(req, res)=>{
   try {
     const user = await data.findByCredentials(
       req.body.email,
