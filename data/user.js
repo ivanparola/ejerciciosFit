@@ -44,6 +44,16 @@ async function addUser(user) {
   return result;
 }
 
+/* Codificar la pass antes de pegar en la base de datos */
+async function updateUser(id, user){
+  const connectiondb = await connection.getConnection();
+  const o_id = new ObjectId(id);
+  const result = connectiondb.db(DATABASE)
+          .collection(COLLECTION_USERS)
+          .updateOne({_id:o_id}, {$set: user});
+  return result;
+}
+
 async function addAdmin(user) {
   user.rol = "administrador";
   return addUser(user);
@@ -119,40 +129,17 @@ async function getFavoritos(userid) {
                       .db(DATABASE)
                       .collection(COLLECTION_USERS)
                       .findOne({ _id: new ObjectId(userid)});
-
   return user.favoritos;  
 } 
 
-/* async function setPlan(exerciseid, numrutina, userid) {
+async function getRutina(userid) {
   const connectiondb = await connection.getConnection();
   const user = await connectiondb
                       .db(DATABASE)
                       .collection(COLLECTION_USERS)
-                      .findOne({ _id: new ObjectId(userid) });
-
-  if(user.rutina.find((diarutina) => diarutina == numrutina ))
-
-  let result;
- 
-    if (user.rutina.ejerciciosdia.find((exercise) => exercise == exerciseid)) {
-      result = connectiondb
-                .db(DATABASE)
-                .collection(COLLECTION_USERS)
-                .updateOne(
-                  { _id: new ObjectId(userid) },
-                  { $pull: { "ejerciciosdia": exerciseid } }
-        );
-    } else {
-      result = connectiondb
-                .db(DATABASE)
-                .collection(COLLECTION_USERS)
-                .updateOne(
-                  { _id: new ObjectId(userid) },
-                  { $addToSet: { "favoritos": exerciseid } }
-                );
-    }
-  return result;
-} */
+                      .findOne({ _id: new ObjectId(userid)});
+  return user.rutina;  
+} 
 
 module.exports = {
   addUser,
@@ -163,5 +150,6 @@ module.exports = {
   getAllUsers,
   deleteUser,
   addAdmin,
-  getFavoritos
+  getFavoritos,
+  updateUser
 };
