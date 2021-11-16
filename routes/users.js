@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 const data = require('../data/user');
 const jwt = require('jsonwebtoken');
-const auth = require('../middleware/auth')
+const auth = require('../middleware/auth');
+const validator = require("email-validator");
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -28,13 +29,21 @@ router.get('/:id', async(req,res,next)=>{
 });
 
 router.post('/', async (req, res)=>{
-  // TODO: Validar que sea correcto el objeto usuario
-  const result = await data.addUser(req.body);
-  res.send(result);
+/*   try{
+    const userdata = req.body;
+    if(!validator.validate(userdata.email) || !userdata.password){
+      res.status(400).json({'error': 'datos no válidos'});
+      return;
+    }
+    const result = await data.addUser(req.body);
+    res.send(result);
+  }catch(error){
+    res.status(400).send(error.message);
+  } */
 });
 
 router.post('/admin', auth,  async (req, res)=>{
-  // TODO: Validar que sea correcto el objeto usuario
+  /* if(!validator.validate(userdata.email) */
   const result = await data.addAdmin(req.body);
   res.send(result);
 });

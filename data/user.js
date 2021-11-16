@@ -6,6 +6,7 @@ const DATABASE = "ejercicios_fit";
 const COLLECTION_USERS = "users";
 const ObjectId = require("mongodb").ObjectId;
 
+
 async function getUser(id) {
   const clientmongo = await connection.getConnection();
   const o_id = new ObjectId(id);
@@ -37,13 +38,12 @@ async function addAdmin(user) {
   return addUser(user);
 }
 
-/* validar existencia de usuario y validar password que corresponda */
 async function findByCredentials(email, password) {
   const connectiondb = await connection.getConnection();
   const user = await connectiondb
-    .db(DATABASE)
-    .collection(COLLECTION_USERS)
-    .findOne({ email: email });
+                      .db(DATABASE)
+                      .collection(COLLECTION_USERS)
+                      .findOne({ email: email });
   if (!user) {
     throw new Error("Credenciales no validas");
   }
@@ -75,30 +75,29 @@ async function deleteUser(id){
 
 async function setFavorito(exerciseid, userid) {
   const connectiondb = await connection.getConnection();
-  /* validar el ejercicio exista (su id) */
   const user = await connectiondb
-    .db(DATABASE)
-    .collection(COLLECTION_USERS)
-    .findOne({ _id: new ObjectId(userid) });
+                      .db(DATABASE)
+                      .collection(COLLECTION_USERS)
+                      .findOne({ _id: new ObjectId(userid) });
 
   let result;
  
     if (user.favoritos.find((exercise) => exercise == exerciseid)) {
       result = connectiondb
-        .db(DATABASE)
-        .collection(COLLECTION_USERS)
-        .updateOne(
-          { _id: new ObjectId(userid) },
-          { $pull: { "favoritos": exerciseid } }
+                .db(DATABASE)
+                .collection(COLLECTION_USERS)
+                .updateOne(
+                  { _id: new ObjectId(userid) },
+                  { $pull: { "favoritos": exerciseid } }
         );
     } else {
       result = connectiondb
-        .db(DATABASE)
-        .collection(COLLECTION_USERS)
-        .updateOne(
-          { _id: new ObjectId(userid) },
-          { $addToSet: { "favoritos": exerciseid } }
-        );
+                .db(DATABASE)
+                .collection(COLLECTION_USERS)
+                .updateOne(
+                  { _id: new ObjectId(userid) },
+                  { $addToSet: { "favoritos": exerciseid } }
+                );
     }
   return result;
 }
