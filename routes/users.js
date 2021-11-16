@@ -8,12 +8,9 @@ const validator = require("email-validator");
 
 /* GET users listing. */
 router.get('/', async function(req, res, next) {
-  res.json(await data.getAllUsers()); 
+  res.send('Esto es EjerciciosFit'); 
+ /*  res.json(await data.getAllUsers());  */
 });
-
-// router.get('/', function(req, res, next) {
-//   res.send('respond with a resource'); 
-// });
 
 router.post('/login', async(req, res)=>{
   try {
@@ -33,34 +30,23 @@ router.get('/:id', async(req,res,next)=>{
   res.json(await data.getUser(req.params.id));
 });
 
-router.post('/', async (req, res)=>{
-/*   try{
-    const userdata = req.body;
-    if(!validator.validate(userdata.email) || !userdata.password){
+router.post('/', auth,  async (req, res)=>{
+  try {
+    const o_User = req.body;
+    if(!validator.validate(o_User.email) || !o_User.password){
       res.status(400).json({'error': 'datos no válidos'});
-      return;
+        return;
     }
     const result = await data.addUser(req.body);
     res.send(result);
-  }catch(error){
+  } catch (error) {
     res.status(400).send(error.message);
-  } */
-});
-
-router.post('/admin', auth,  async (req, res)=>{
-  /* if(!validator.validate(userdata.email) */
-  const o_User = req.body;
-  if(!o_User.email || !o_User.password){
-    res.status(400).json({'error': 'datos no válidos'});
-      return;
   }
-  const result = await data.addUser(req.body);
-  res.send(result);
 });
 
 router.post('/admin', auth,  async (req, res)=>{
   const o_User = req.body;
-  if(!o_User.email || !o_User.password){
+  if(!validator.validate(o_User.email) || !o_User.password){
     res.status(400).json({'error': 'datos no válidos'});
       return;
   }
