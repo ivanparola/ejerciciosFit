@@ -2,13 +2,10 @@ var express = require("express");
 var router = express.Router();
 const data = require("../data/user");
 const dataEj = require("../data/ejercicio");
-const ObjectId = require("mongodb").ObjectId;
-const jwt = require("jsonwebtoken");
 const auth = require("../middleware/auth");
 const authadmin = require("../middleware/authadmin");
 const validator = require("email-validator");
 const adminvalidador = [auth, authadmin];
-
 
 router.get("/", adminvalidador, async function (req, res, next) {
   try {
@@ -19,25 +16,27 @@ router.get("/", adminvalidador, async function (req, res, next) {
   }
 });
 
-router.put('/:id', auth, async (req, res)=>{
+router.put("/:id", auth, async (req, res) => {
   try {
     const result = await data.updateUser(req.params.id, req.body);
-    result.matchedCount ? res.send(result) : res.status(404).json({'error': "id not found"});
-} catch (error) { 
-  res.status(500).json({'error': error.message});
-}
+    result.matchedCount
+      ? res.send(result)
+      : res.status(404).json({ error: "id not found" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-router.get('/', adminvalidador, async function(req, res, next) {
-   try{ 
-     /* res.send('Esto es EjerciciosFit');   */
-     res.json(await data.getAllUsers()); 
-  }catch (error) {
-    res.status(403).json({'error': error.message});
-  } 
+router.get("/", adminvalidador, async function (req, res, next) {
+  try {
+    /* res.send('Esto es EjerciciosFit');   */
+    res.json(await data.getAllUsers());
+  } catch (error) {
+    res.status(403).json({ error: error.message });
+  }
 });
 
-router.post('/login', async(req, res)=>{
+router.post("/login", async (req, res) => {
   try {
     const user = await data.findByCredentials(
       req.body.email,

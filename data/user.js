@@ -45,12 +45,23 @@ async function addUser(user) {
 }
 
 /* Codificar la pass antes de pegar en la base de datos */
-async function updateUser(id, user){
+async function updateUser(id, user) {
   const connectiondb = await connection.getConnection();
   const o_id = new ObjectId(id);
-  const result = connectiondb.db(DATABASE)
-          .collection(COLLECTION_USERS)
-          .updateOne({_id:o_id}, {$set: user});
+  const result = connectiondb
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .updateOne({ _id: o_id }, { $set: user });
+  return result;
+}
+
+async function updateRutinas(id, rutinas) {
+  const connectiondb = await connection.getConnection();
+  const o_id = new ObjectId(id);
+  const result = connectiondb
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .updateOne({ _id: o_id }, { $set: { rutinas: rutinas } });
   return result;
 }
 
@@ -136,11 +147,11 @@ async function getFavoritos(userid) {
 async function getRutina(userid) {
   const connectiondb = await connection.getConnection();
   const user = await connectiondb
-                      .db(DATABASE)
-                      .collection(COLLECTION_USERS)
-                      .findOne({ _id: new ObjectId(userid)});
-  return user.rutina;  
-} 
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .findOne({ _id: new ObjectId(userid) });
+  return user.rutina;
+}
 
 module.exports = {
   addUser,
@@ -152,5 +163,6 @@ module.exports = {
   deleteUser,
   addAdmin,
   getFavoritos,
-  updateUser
+  updateUser,
+  updateRutinas,
 };

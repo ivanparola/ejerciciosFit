@@ -1,81 +1,124 @@
-const connection = require('./connection');
-const ObjectId = require('mongodb').ObjectId; 
-const DATABASE = 'ejercicios_fit';
-const COLLECTION_RUTINAS = 'rutinas';
+const ObjectId = require("mongodb").ObjectId;
+const connection = require("./connection");
+const DATABASE = "ejercicios_fit";
+const COLLECTION_USERS = "users";
 
-async function getAll(){
-    const clientmongo = await connection.getConnection();
-    const ejercicios = await clientmongo.db(DATABASE)
-                        .collection(COLLECTION_RUTINAS)
-                        .find()
-                        .toArray();
-    return ejercicios;                    
+const rutinaMock = {
+  nombre: "Mock2",
+  dias: [0, 3, 5],
+  ejercicios: [],
+};
+
+async function getRutina(userId, nombre) {
+  const connectiondb = await connection.getConnection();
+  const rutinas = await connectiondb
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .find(
+      {
+        _id: new ObjectId(userId),
+        "rutinas.nombre": nombre,
+      },
+      { _id: 0, "rutinas.$": 1 }
+    )
+    .toArray();
+
+  console.log(rutinas);
+
+  if (!rutinas) return {};
+
+  return;
+
+  //const rutina = rutinas.find((r) => r._id == new ObjectId(id));
+
+  console.log(rutina);
+
+  return result;
 }
 
-async function getEjercicios(tipo, dificultad){
-    const clientmongo = await connection.getConnection();
-    const query_st = {...tipo && {"tipo": tipo},
-                      ...dificultad && {"dificultad": dificultad} }
-    const ejercicios = await clientmongo.db(DATABASE)
-                        .collection(COLLECTION_RUTINAS)
-                        .find(query_st)
-                        .toArray();
-    return ejercicios;                    
+async function addRutina(userId, rutina) {
+  const connectiondb = await connection.getConnection();
+  const result = await connectiondb
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .updateOne(
+      { _id: new ObjectId(userId) },
+      { $addToSet: { rutinas: rutina } }
+    );
+  return result;
 }
 
-/* async function getEjercicioPorTipo(tipo){
-    const clientmongo = await connection.getConnection();
-    const query_st = {...tipo && {"tipo": tipo}}
-    const ejercicios = await clientmongo.db(DATABASE)
-                        .collection(COLLECTION_EJERCICIOS)
-                        .find(query_st)
-                        .toArray();
-    return ejercicios;                    
+async function addEjercicios(userId, name, ids) {
+  const connectiondb = await connection.getConnection();
+  const result = await connectiondb
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .updateOne(
+      {
+        _id: new ObjectId(userId),
+        rutinas: { $elemMatch: { nombre: name } },
+      },
+      {
+        $addToSet: {
+          "rutinas.$.ejercicios": { $each: ids },
+        },
+      }
+    );
+  return result;
 }
 
-async function getEjerciciosPorDificultad(dificultad){
-    const clientmongo = await connection.getConnection();
-    const query_st = {...dificultad && {"dificultad": dificultad} }
-    const ejercicios = await clientmongo.db(DATABASE)
-                        .collection(COLLECTION_EJERCICIOS)
-                        .find(query_st)
-                        .toArray();
-    return ejercicios;                    
-} */
-
-async function getEjercicio(id){
-    const clientmongo = await connection.getConnection();
-    const o_id = new ObjectId(id);
-    const ejercicio = await clientmongo.db(DATABASE)
-                        .collection(COLLECTION_RUTINAS)
-                        .findOne({_id:o_id});
-    return ejercicio;                    
+async function removeEjercicios(userId, name, ids) {
+  const connectiondb = await connection.getConnection();
+  const result = await connectiondb
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .updateOne(
+      {
+        _id: new ObjectId(userId),
+        rutinas: { $elemMatch: { nombre: name } },
+      },
+      { $pull: { "rutinas.$.ejercicios": { $in: ids } } }
+    );
+  return result;
 }
 
-async function addEjercicio(ejercicio){
-    const connectiondb = await connection.getConnection();
-    const result = connectiondb.db(DATABASE)
-            .collection(COLLECTION_RUTINAS)
-            .insertOne(ejercicio);
-    return result;
+async function updateRutina(userId, rutina) {
+  const connectiondb = await connection.getConnection();
+  const result = await connectiondb
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .updateOne(
+      {
+        _id: new ObjectId(userId),
+        rutinas: { $elemMatch: { nombre: rutina.nombre } },
+      },
+      {
+        $set: {
+          dias: rutina.dias,
+          nombre: rutina.nombre,
+        },
+      }
+    );
+  return result;
 }
 
-async function updateEjercicio(id, ejercicio){
-    const connectiondb = await connection.getConnection();
-    const o_id = new ObjectId(id);
-    const result = connectiondb.db(DATABASE)
-            .collection(COLLECTION_RUTINAS)
-            .updateOne({_id:o_id}, {$set: ejercicio});
-    return result;
+async function deleteRutina(userId, name) {
+  const connectiondb = await connection.getConnection();
+  const result = connectiondb
+    .db(DATABASE)
+    .collection(COLLECTION_USERS)
+    .updateOne(
+      { _id: new ObjectId(userId) },
+      { $pull: { rutinas: { nombre: name } } }
+    );
+  return result;
 }
 
-async function deleteEjercicio(id){
-    const connectiondb = await connection.getConnection();
-    const o_id = new ObjectId(id);
-    const result = connectiondb.db(DATABASE)
-            .collection(COLLECTION_RUTINAS)
-            .deleteOne({_id:o_id});
-    return result;
-}
-
-module.exports = {getAllEjercicios, getEjercicios, getEjercicio, addEjercicio, updateEjercicio, deleteEjercicio};
+module.exports = {
+  getRutina,
+  addRutina,
+  deleteRutina,
+  updateRutina,
+  addEjercicios,
+  removeEjercicios,
+};

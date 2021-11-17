@@ -67,6 +67,17 @@ async function getEjercicio(id) {
   return ejercicio;
 }
 
+async function getEjerciciosByIds(ids) {
+  const clientmongo = await connection.getConnection();
+  const o_ids = ids.map((id) => new ObjectId(id));
+  const ejercicio = await clientmongo
+    .db(DATABASE)
+    .collection(COLLECTION_EJERCICIOS)
+    .find({ _id: { $in: o_ids } })
+    .toArray();
+  return ejercicio;
+}
+
 async function addEjercicio(ejercicio) {
   const connectiondb = await connection.getConnection();
   const result = connectiondb
@@ -98,6 +109,7 @@ async function deleteEjercicio(id) {
 
 module.exports = {
   getAllEjercicios,
+  getEjerciciosByIds,
   getEjercicios,
   getEjercicio,
   addEjercicio,
