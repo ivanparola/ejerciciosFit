@@ -24,7 +24,6 @@ router.get("/", auth, async (req, res) => {
   res.json(ejercicios);
 });
 
-/* Si lo pongo abajo no funciona */
 router.get("/favoritos", auth, async (req, res) => {
   try {
     let favoritos = await dataUser.getFavoritos(req.params.userid);

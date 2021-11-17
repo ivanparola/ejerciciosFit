@@ -27,15 +27,6 @@ router.put("/:id", auth, async (req, res) => {
   }
 });
 
-router.get("/", adminvalidador, async function (req, res, next) {
-  try {
-    /* res.send('Esto es EjerciciosFit');   */
-    res.json(await data.getAllUsers());
-  } catch (error) {
-    res.status(403).json({ error: error.message });
-  }
-});
-
 router.post("/login", async (req, res) => {
   try {
     const user = await data.findByCredentials(
@@ -113,22 +104,5 @@ router.put("/favoritos/:id", auth, async (req, res) => {
     res.status(404).json({ error: error.message });
   }
 });
-
-/* router.put('/rutina', auth, async(req, res)=>{
-  try{
-    id_param = req.params.id;
-    let fav = await dataEj.getEjercicio(id_param);
-    if(!fav){
-        res.status(404).json({'error': 'Ejercicio no encontrado'});
-        return;
-    }
-    let favoritos = await data.setFavorito(req.params.id, req.params.userid);
-    res.json(favoritos);
-    res.end();
-  }catch(error){
-    console.log(error.message);
-    res.status(404).json({'error': error.message});
-  }
-}); */
 
 module.exports = router;
