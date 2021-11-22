@@ -34,5 +34,10 @@ Instrcciones de Uso
 Para utilizar el proyecto "Ejercicios Fit" lo primero que debe hacer es ejecutar el siguiente comando:
 npm install 
 
+crear .env con las siguentes variables de entorno: 
+-
+-
+
 
 Documentacion de los endspoints, listado de los endpoints del proyecto
+https://documenter.getpostman.com/view/17916271/UVCCd3dM
