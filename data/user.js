@@ -1,12 +1,9 @@
-const mongodb = require("mongodb");
 const connection = require("./connection");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const DATABASE = "ejercicios_fit";
 const COLLECTION_USERS = "users";
-const COLLECTION_EJERCICIOS = "ejercicios";
-
-const ObjectId = require("mongodb").ObjectId;
+const parseObjectId = require("../helpers/parseObjectId");
 
 async function getAllUsers() {
   const clientmongo = await connection.getConnection();
@@ -20,7 +17,7 @@ async function getAllUsers() {
 
 async function getUser(id) {
   const clientmongo = await connection.getConnection();
-  const o_id = new ObjectId(id);
+  const o_id = parseObjectId(id);
   const user = await clientmongo
     .db(DATABASE)
     .collection(COLLECTION_USERS)
@@ -47,7 +44,7 @@ async function addUser(user) {
 /* Codificar la pass antes de pegar en la base de datos */
 async function updateUser(id, user) {
   const connectiondb = await connection.getConnection();
-  const o_id = new ObjectId(id);
+  const o_id = parseObjectId(id);
   const result = connectiondb
     .db(DATABASE)
     .collection(COLLECTION_USERS)
@@ -57,7 +54,7 @@ async function updateUser(id, user) {
 
 async function updateRutinas(id, rutinas) {
   const connectiondb = await connection.getConnection();
-  const o_id = new ObjectId(id);
+  const o_id = parseObjectId(id);
   const result = connectiondb
     .db(DATABASE)
     .collection(COLLECTION_USERS)
@@ -97,7 +94,7 @@ function generatedAuthToken(user) {
 
 async function deleteUser(id) {
   const connectiondb = await connection.getConnection();
-  const o_id = new ObjectId(id);
+  const o_id = parseObjectId(id);
   const result = connectiondb
     .db(DATABASE)
     .collection(COLLECTION_USERS)
@@ -110,7 +107,7 @@ async function setFavorito(exerciseid, userid) {
   const user = await connectiondb
     .db(DATABASE)
     .collection(COLLECTION_USERS)
-    .findOne({ _id: new ObjectId(userid) });
+    .findOne({ _id: parseObjectId(userid) });
 
   let result;
 
@@ -119,7 +116,7 @@ async function setFavorito(exerciseid, userid) {
       .db(DATABASE)
       .collection(COLLECTION_USERS)
       .updateOne(
-        { _id: new ObjectId(userid) },
+        { _id: parseObjectId(userid) },
         { $pull: { favoritos: exerciseid } }
       );
   } else {
@@ -127,7 +124,7 @@ async function setFavorito(exerciseid, userid) {
       .db(DATABASE)
       .collection(COLLECTION_USERS)
       .updateOne(
-        { _id: new ObjectId(userid) },
+        { _id: parseObjectId(userid) },
         { $addToSet: { favoritos: exerciseid } }
       );
   }
@@ -139,18 +136,9 @@ async function getFavoritos(userid) {
   const user = await connectiondb
     .db(DATABASE)
     .collection(COLLECTION_USERS)
-    .findOne({ _id: new ObjectId(userid) });
+    .findOne({ _id: parseObjectId(userid) });
 
   return user.favoritos;
-}
-
-async function getRutina(userid) {
-  const connectiondb = await connection.getConnection();
-  const user = await connectiondb
-    .db(DATABASE)
-    .collection(COLLECTION_USERS)
-    .findOne({ _id: new ObjectId(userid) });
-  return user.rutina;
 }
 
 module.exports = {

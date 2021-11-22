@@ -1,7 +1,7 @@
 const connection = require("./connection");
-const ObjectId = require("mongodb").ObjectId;
 const DATABASE = "ejercicios_fit";
 const COLLECTION_EJERCICIOS = "ejercicios";
+const parseObjectId = require("../helpers/parseObjectId");
 
 async function getAllEjercicios() {
   const clientmongo = await connection.getConnection();
@@ -27,19 +27,9 @@ async function getEjercicios(tipo, dificultad) {
   return ejercicios;
 }
 
-async function getFavoritos(userid) {
-  const connectiondb = await connection.getConnection();
-  const user = await connectiondb
-    .db(DATABASE)
-    .collection(COLLECTION_USERS)
-    .findOne({ _id: new ObjectId(userid) });
-
-  return user.favoritos;
-}
-
 async function getEjercicio(id) {
   const clientmongo = await connection.getConnection();
-  const o_id = new ObjectId(id);
+  const o_id = parseObjectId(id);
   const ejercicio = await clientmongo
     .db(DATABASE)
     .collection(COLLECTION_EJERCICIOS)
@@ -49,7 +39,7 @@ async function getEjercicio(id) {
 
 async function getEjerciciosByIds(ids) {
   const clientmongo = await connection.getConnection();
-  const o_ids = ids.map((id) => new ObjectId(id));
+  const o_ids = ids.map((id) => parseObjectId(id));
   const ejercicio = await clientmongo
     .db(DATABASE)
     .collection(COLLECTION_EJERCICIOS)
@@ -69,7 +59,7 @@ async function addEjercicio(ejercicio) {
 
 async function updateEjercicio(id, ejercicio) {
   const connectiondb = await connection.getConnection();
-  const o_id = new ObjectId(id);
+  const o_id = parseObjectId(id);
   const result = connectiondb
     .db(DATABASE)
     .collection(COLLECTION_EJERCICIOS)
@@ -79,12 +69,18 @@ async function updateEjercicio(id, ejercicio) {
 
 async function deleteEjercicio(id) {
   const connectiondb = await connection.getConnection();
-  const o_id = new ObjectId(id);
+  const o_id = parseObjectId(id);
   const result = connectiondb
     .db(DATABASE)
     .collection(COLLECTION_EJERCICIOS)
     .deleteOne({ _id: o_id });
   return result;
+}
+
+/* esta función recibe un array de Ids y devuelve un array solo con aquellos ids válidos */
+async function filterEjerciciosIds(ids) {
+  const ejercicios = await getEjerciciosByIds(ids);
+  return ejercicios.map((e) => e._id);
 }
 
 module.exports = {
@@ -95,4 +91,5 @@ module.exports = {
   addEjercicio,
   updateEjercicio,
   deleteEjercicio,
+  filterEjerciciosIds,
 };

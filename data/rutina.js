@@ -1,7 +1,9 @@
-const ObjectId = require("mongodb").ObjectId;
 const connection = require("./connection");
 const DATABASE = "ejercicios_fit";
 const COLLECTION_USERS = "users";
+const dataEjercicios = require("../data/ejercicio");
+const parseObjectId = require("../helpers/parseObjectId");
+const { parse } = require("dotenv");
 
 const rutinaMock = {
   nombre: "Mock2",
@@ -11,38 +13,40 @@ const rutinaMock = {
 
 async function getRutina(userId, nombre) {
   const connectiondb = await connection.getConnection();
-  const rutinas = await connectiondb
+  const user = await connectiondb
     .db(DATABASE)
     .collection(COLLECTION_USERS)
-    .find(
+    .aggregate([
       {
-        _id: new ObjectId(userId),
-        "rutinas.nombre": nombre,
+        $unwind: "$rutinas",
       },
-      { _id: 0, "rutinas.$": 1 }
-    )
+      { $match: { _id: parseObjectId(userId), "rutinas.nombre": nombre } },
+    ])
     .toArray();
 
-  console.log(rutinas);
+  /* Si no existe la rutina, devuelvo un objeto vacío */
+  if (!user[0]) return {};
 
-  if (!rutinas) return {};
+  const result = user[0].rutinas;
 
-  return;
-
-  //const rutina = rutinas.find((r) => r._id == new ObjectId(id));
-
-  console.log(rutina);
+  result.ejercicios = await dataEjercicios.getEjerciciosByIds(
+    result.ejercicios
+  );
 
   return result;
 }
 
 async function addRutina(userId, rutina) {
+  rutina.ejercicios = await dataEjercicios.filterEjerciciosIds(
+    rutina.ejercicios
+  );
+
   const connectiondb = await connection.getConnection();
   const result = await connectiondb
     .db(DATABASE)
     .collection(COLLECTION_USERS)
     .updateOne(
-      { _id: new ObjectId(userId) },
+      { _id: parseObjectId(userId) },
       { $addToSet: { rutinas: rutina } }
     );
   return result;
@@ -55,12 +59,14 @@ async function addEjercicios(userId, name, ids) {
     .collection(COLLECTION_USERS)
     .updateOne(
       {
-        _id: new ObjectId(userId),
+        _id: parseObjectId(userId),
         rutinas: { $elemMatch: { nombre: name } },
       },
       {
         $addToSet: {
-          "rutinas.$.ejercicios": { $each: ids },
+          "rutinas.$.ejercicios": {
+            $each: await dataEjercicios.filterEjerciciosIds(ids),
+          },
         },
       }
     );
@@ -74,10 +80,14 @@ async function removeEjercicios(userId, name, ids) {
     .collection(COLLECTION_USERS)
     .updateOne(
       {
-        _id: new ObjectId(userId),
+        _id: parseObjectId(userId),
         rutinas: { $elemMatch: { nombre: name } },
       },
-      { $pull: { "rutinas.$.ejercicios": { $in: ids } } }
+      {
+        $pull: {
+          "rutinas.$.ejercicios": { $in: ids.map((i) => parseObjectId(i)) },
+        },
+      }
     );
   return result;
 }
@@ -89,7 +99,7 @@ async function updateRutina(userId, rutina) {
     .collection(COLLECTION_USERS)
     .updateOne(
       {
-        _id: new ObjectId(userId),
+        _id: parseObjectId(userId),
         rutinas: { $elemMatch: { nombre: rutina.nombre } },
       },
       {
@@ -108,7 +118,7 @@ async function deleteRutina(userId, name) {
     .db(DATABASE)
     .collection(COLLECTION_USERS)
     .updateOne(
-      { _id: new ObjectId(userId) },
+      { _id: parseObjectId(userId) },
       { $pull: { rutinas: { nombre: name } } }
     );
   return result;
