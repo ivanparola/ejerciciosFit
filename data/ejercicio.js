@@ -77,6 +77,12 @@ async function deleteEjercicio(id) {
   return result;
 }
 
+/* esta función recibe un array de Ids y devuelve un array solo con aquellos ids válidos */
+async function filterEjerciciosIds(ids) {
+  const ejercicios = await getEjerciciosByIds(ids);
+  return ejercicios.map((e) => e._id);
+}
+
 module.exports = {
   getAllEjercicios,
   getEjerciciosByIds,
@@ -85,4 +91,5 @@ module.exports = {
   addEjercicio,
   updateEjercicio,
   deleteEjercicio,
+  filterEjerciciosIds,
 };

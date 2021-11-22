@@ -1,8 +1,9 @@
-const parseObjectId = require("../helpers/parseObjectId");
 const connection = require("./connection");
-const dataEjercicios = require("../data/ejercicio");
 const DATABASE = "ejercicios_fit";
 const COLLECTION_USERS = "users";
+const dataEjercicios = require("../data/ejercicio");
+const parseObjectId = require("../helpers/parseObjectId");
+const { parse } = require("dotenv");
 
 const rutinaMock = {
   nombre: "Mock2",
@@ -36,6 +37,10 @@ async function getRutina(userId, nombre) {
 }
 
 async function addRutina(userId, rutina) {
+  rutina.ejercicios = await dataEjercicios.filterEjerciciosIds(
+    rutina.ejercicios
+  );
+
   const connectiondb = await connection.getConnection();
   const result = await connectiondb
     .db(DATABASE)
@@ -48,10 +53,6 @@ async function addRutina(userId, rutina) {
 }
 
 async function addEjercicios(userId, name, ids) {
-  /* filtro los ids recibidos para que sean ids válidos */
-  const ejercicios = await dataEjercicios.getEjerciciosByIds(ids);
-  ids = ejercicios.map((e) => e._id);
-
   const connectiondb = await connection.getConnection();
   const result = await connectiondb
     .db(DATABASE)
@@ -63,7 +64,9 @@ async function addEjercicios(userId, name, ids) {
       },
       {
         $addToSet: {
-          "rutinas.$.ejercicios": { $each: ids },
+          "rutinas.$.ejercicios": {
+            $each: await dataEjercicios.filterEjerciciosIds(ids),
+          },
         },
       }
     );
@@ -80,7 +83,11 @@ async function removeEjercicios(userId, name, ids) {
         _id: parseObjectId(userId),
         rutinas: { $elemMatch: { nombre: name } },
       },
-      { $pull: { "rutinas.$.ejercicios": { $in: ids } } }
+      {
+        $pull: {
+          "rutinas.$.ejercicios": { $in: ids.map((i) => parseObjectId(i)) },
+        },
+      }
     );
   return result;
 }

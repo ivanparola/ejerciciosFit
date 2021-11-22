@@ -3,11 +3,14 @@ let router = express.Router();
 const data = require("../data/rutina");
 const auth = require("../middleware/auth");
 
+const RUTINA_NOT_FOUND_ERROR = "No existe esa rutina";
+const RUTINA_ALREADY_EXISTS_ERROR = "Ya existe una rutina con ese nombre";
+
 router.get("/:name", auth, async function (req, res) {
   try {
     const result = await data.getRutina(req.params.userid, req.params.name);
 
-    if (!result.nombre) throw { code: 404, message: "No existe esa rutina" };
+    if (!result.nombre) throw { code: 404, message: RUTINA_NOT_FOUND_ERROR };
 
     res.json(result);
   } catch (error) {
@@ -22,7 +25,7 @@ router.post("/", auth, async function (req, res) {
 
     /* si ya existe la rutina, se devuelve el mensaje de error */
     if (rutina.nombre)
-      throw { code: 409, message: "Ya existe una rutina con ese nombre" };
+      throw { code: 409, message: RUTINA_ALREADY_EXISTS_ERROR };
 
     rutina = req.body;
     if (!rutina.dias) rutina.dias = [];
@@ -45,7 +48,7 @@ router.put("/ejercicios/:name", auth, async function (req, res) {
     );
 
     if (!result.matchedCount)
-      throw { code: 404, message: "No existe esa rutina" };
+      throw { code: 404, message: RUTINA_NOT_FOUND_ERROR };
 
     res.send(result);
   } catch (error) {
@@ -63,7 +66,7 @@ router.delete("/ejercicios/:name", auth, async function (req, res) {
     );
 
     if (!result.matchedCount)
-      throw { code: 404, message: "No existe esa rutina" };
+      throw { code: 404, message: RUTINA_NOT_FOUND_ERROR };
 
     res.send(result);
   } catch (error) {
@@ -77,7 +80,7 @@ router.delete("/:name", auth, async function (req, res) {
     const result = await data.deleteRutina(req.params.userid, req.params.name);
 
     if (!result.modifiedCount)
-      throw { code: 404, message: "No existe esa rutina" };
+      throw { code: 404, message: RUTINA_NOT_FOUND_ERROR };
 
     res.send(result);
   } catch (error) {
