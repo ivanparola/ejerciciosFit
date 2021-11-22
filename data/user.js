@@ -144,15 +144,6 @@ async function getFavoritos(userid) {
   return user.favoritos;
 }
 
-async function getRutina(userid) {
-  const connectiondb = await connection.getConnection();
-  const user = await connectiondb
-    .db(DATABASE)
-    .collection(COLLECTION_USERS)
-    .findOne({ _id: new ObjectId(userid) });
-  return user.rutina;
-}
-
 module.exports = {
   addUser,
   findByCredentials,

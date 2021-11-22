@@ -6,17 +6,25 @@ const auth = require("../middleware/auth");
 router.get("/:name", auth, async function (req, res) {
   try {
     const result = await data.getRutina(req.params.userid, req.params.name);
+
+    if (!result.nombre) throw { code: 404, message: "No existe esa rutina" };
+
     res.json(result);
-  } catch {
+  } catch (error) {
     console.log(error.message);
-    res.status(500).json({ error: error.message });
+    res.status(error.code ? error.code : 500).json({ error: error.message });
   }
 });
 
 router.post("/", auth, async function (req, res) {
   try {
-    let rutina = req.body;
+    let rutina = await data.getRutina(req.params.userid, req.body.nombre);
 
+    /* si ya existe la rutina, se devuelve el mensaje de error */
+    if (rutina.nombre)
+      throw { code: 409, message: "Ya existe una rutina con ese nombre" };
+
+    rutina = req.body;
     if (!rutina.dias) rutina.dias = [];
     if (!rutina.ejercicios) rutina.ejercicios = [];
 
@@ -24,7 +32,7 @@ router.post("/", auth, async function (req, res) {
     res.send(result);
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ error: error.message });
+    res.status(error.code ? error.code : 500).json({ error: error.message });
   }
 });
 
@@ -35,10 +43,14 @@ router.put("/ejercicios/:name", auth, async function (req, res) {
       req.params.name,
       req.body.ids
     );
+
+    if (!result.matchedCount)
+      throw { code: 404, message: "No existe esa rutina" };
+
     res.send(result);
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ error: error.message });
+    res.status(error.code ? error.code : 500).json({ error: error.message });
   }
 });
 
@@ -49,20 +61,28 @@ router.delete("/ejercicios/:name", auth, async function (req, res) {
       req.params.name,
       req.body.ids
     );
+
+    if (!result.matchedCount)
+      throw { code: 404, message: "No existe esa rutina" };
+
     res.send(result);
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ error: error.message });
+    res.status(error.code ? error.code : 500).json({ error: error.message });
   }
 });
 
 router.delete("/:name", auth, async function (req, res) {
   try {
     const result = await data.deleteRutina(req.params.userid, req.params.name);
+
+    if (!result.modifiedCount)
+      throw { code: 404, message: "No existe esa rutina" };
+
     res.send(result);
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ error: error.message });
+    res.status(error.code ? error.code : 500).json({ error: error.message });
   }
 });
 
