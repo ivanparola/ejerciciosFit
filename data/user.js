@@ -28,7 +28,7 @@ async function getUser(id) {
 async function addUser(user) {
   const connectiondb = await connection.getConnection();
   user.favoritos = [];
-  user.rutina = [];
+  user.rutinas = [];
   user.activo = true;
   if (!user.rol) {
     user.rol = "usuario";
