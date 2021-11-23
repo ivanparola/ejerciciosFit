@@ -29,14 +29,14 @@ Funcionalidades:
 - ABM rutina
 
 
-Instrcciones de Uso
+Instrucciones de Uso
+
+Colocar el archivo .env que se entrega con la documentación, en la raíz del proyecto.
 
 Para utilizar el proyecto "Ejercicios Fit" lo primero que debe hacer es ejecutar el siguiente comando:
-npm install 
+`npm install` 
 
-crear .env con las siguentes variables de entorno: 
--
--
+Luego, puede realizar `npm start` o si desea usar nodemon realizar `npm run start-dev`
 
 
 Documentacion de los endspoints, listado de los endpoints del proyecto
