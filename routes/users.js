@@ -48,7 +48,7 @@ router.get("/:id", async (req, res, next) => {
   res.json(await data.getUser(req.params.id));
 });
 
-router.post("/", auth, async (req, res) => {
+router.post("/", adminvalidador, async (req, res) => {
   try {
     const o_User = req.body;
     if (!validator.validate(o_User.email) || !o_User.password) {
@@ -72,7 +72,7 @@ router.post("/admin", auth, async (req, res) => {
   res.send(result);
 });
 
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", adminvalidador, async (req, res) => {
   try {
     if (req.params.userrol == "usuario" && req.params.userid != req.params.id) {
       res.status(404).json({ error: "no encontrado" });
