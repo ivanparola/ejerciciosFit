@@ -44,11 +44,11 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", auth, async (req, res, next) => {
   res.json(await data.getUser(req.params.id));
 });
 
-router.post("/", adminvalidador, async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const o_User = req.body;
     if (!validator.validate(o_User.email) || !o_User.password) {
